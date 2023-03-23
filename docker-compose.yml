@@ -1,0 +1,34 @@
+version: '3'
+
+services:
+  db:
+    image: postgres:latest
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=statistics_counter_db
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    networks:
+      - backend
+  web:
+    build: .
+    command: uvicorn main:app --host 0.0.0.0 --port 80 --reload
+    volumes:
+      - .:/statistics_counter
+    ports:
+      - "8000:80"
+    depends_on:
+      - db
+    networks:
+      - backend
+
+volumes:
+  postgres_data:
+
+networks:
+  backend:
+    driver: bridge
